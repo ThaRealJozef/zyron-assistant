@@ -392,20 +392,37 @@ LOG_LEVEL=ERROR    # Only errors
 
 ```
 pikachu-assistant/
-├── 📄 main.py                 # Main application entry
-├── 📄 setup.bat              # Automated installer
-├── 📄 run_silent.vbs         # Stealth launcher
-├── 📄 requirements.txt       # Python dependencies
-├── 📄 .env                   # Configuration (create this)
-├── 📂 src/
-│   ├── 📄 telegram_bot.py   # Telegram handler
-│   ├── 📄 voice_control.py  # Voice recognition
-│   ├── 📄 system_control.py # System automation
-│   └── 📄 ai_engine.py      # Ollama integration
-├── 📂 commands/             # Command modules
-├── 📂 logs/                 # Application logs
-└── 📂 venv/                 # Virtual environment
+├── 📄 .gitignore              # Git ignore rules
+├── 📄 README.md               # This file - Project documentation
+├── 📄 brain.py                # AI brain & Ollama integration
+├── 📄 listener.py             # Voice wake word detection
+├── 📄 main.py                 # Main application entry point
+├── 📄 memory.py               # Conversation memory & context
+├── 📄 muscles.py              # System automation & PC control
+├── 📄 requirements.txt        # Python dependencies
+├── 📄 run_silent.vbs          # Stealth launcher (runs hidden)
+├── 📄 setup.bat               # Automated installer & configurator
+├── 📄 start_pikachu.bat       # Quick start script
+├── 📄 tele_agent.py           # Telegram bot handler
+├── 📄 test_mic.py             # Microphone testing utility
+├── 📄 .env                    # Environment config (create this)
+└── 📂 venv/                   # Virtual environment (auto-created)
 ```
+
+### 📝 File Descriptions
+
+| File | Purpose |
+|------|---------|
+| **brain.py** | Core AI engine powered by Ollama (qwen2.5-coder:7b) |
+| **listener.py** | Voice wake word detection ("Hey Pikachu") |
+| **tele_agent.py** | Telegram bot integration for remote control |
+| **muscles.py** | System control (apps, screenshots, files, battery) |
+| **memory.py** | Conversation context & chat history management |
+| **main.py** | Application orchestrator & startup logic |
+| **setup.bat** | One-click installer with progress animations |
+| **run_silent.vbs** | Background launcher (stealth mode) |
+| **start_pikachu.bat** | Quick start without installation |
+| **test_mic.py** | Diagnostic tool for microphone testing |
 
 ---
 
