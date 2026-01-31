@@ -5,14 +5,11 @@ import cv2
 import screen_brightness_control as sbc
 import psutil
 import shutil
-from ctypes import cast, POINTER
-from comtypes import CLSCTX_ALL
-from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 
 # --- PROCESS TRANSLATOR (User words -> Windows .exe names) ---
 PROCESS_NAMES = {
     # Browsers
-    "chrome": "chrome.exe", "googlechrome": "chrome.exe",
+    "chrome": "chrome.exe", "googlechrome": "chrome.exe", "google": "chrome.exe",
     "brave": "brave.exe", "bravebrowser": "brave.exe", 
     "edge": "msedge.exe", "msedge": "msedge.exe", "microsoftedge": "msedge.exe",
     "firefox": "firefox.exe", "mozilla": "firefox.exe",
@@ -46,29 +43,40 @@ PROCESS_NAMES = {
 # --- DYNAMIC BROWSER LOCATOR ---
 def get_browser_path(browser_name):
     """Finds browser executable dynamically without hardcoded paths."""
+    browser_name = browser_name.lower().strip()
+    
     # Map common names to their executable filenames
     exes = {
         "chrome": "chrome.exe",
+        "google": "chrome.exe",
         "brave": "brave.exe", 
         "firefox": "firefox.exe",
+        "mozilla": "firefox.exe",
+        "edge": "msedge.exe",
         "msedge": "msedge.exe",
-        "edge": "msedge.exe"
+        "opera": "launcher.exe" 
     }
     
-    executable = exes.get(browser_name, browser_name)
+    executable = exes.get(browser_name, f"{browser_name}.exe")
     if not executable.endswith(".exe"): executable += ".exe"
     
-    # 1. Ask Windows if it knows where this file is (Best method)
+    # 1. Ask Windows if it knows where this file is
     path = shutil.which(executable)
     if path: return path
     
     # 2. Check common installation folders dynamically
-    possible_roots = [os.environ.get("PROGRAMFILES"), os.environ.get("PROGRAMFILES(X86)")]
+    possible_roots = [
+        os.environ.get("PROGRAMFILES"), 
+        os.environ.get("PROGRAMFILES(X86)"),
+        os.environ.get("LOCALAPPDATA") # Chrome/Brave sometimes install here
+    ]
+    
     common_subdirs = [
-        "Google/Chrome/Application",
-        "BraveSoftware/Brave-Browser/Application",
-        "Microsoft/Edge/Application",
-        "Mozilla Firefox"
+        "Google\\Chrome\\Application",
+        "BraveSoftware\\Brave-Browser\\Application",
+        "Microsoft\\Edge\\Application",
+        "Mozilla Firefox",
+        "Opera"
     ]
     
     for root in possible_roots:
@@ -143,22 +151,28 @@ def get_system_health():
     except Exception as e:
         return f"Error reading system health: {e}"
 
-# --- APP CONTROL (IMPROVED) ---
+# --- APP CONTROL ---
 def open_browser(url, browser_name="default"):
+    print(f"🌐 Request to open '{url}' in '{browser_name}'")
+    
     try:
-        # If default, let Windows decide
-        if browser_name == "default":
+        # If no specific browser requested, use system default
+        if not browser_name or browser_name.lower() == "default":
             webbrowser.open(url)
             return
 
-        # Use the dynamic locator
+        # Find the actual EXE path
         path = get_browser_path(browser_name)
+        
         if path:
+            print(f"   -> Found browser at: {path}")
+            # Register it with python's webbrowser module
             webbrowser.register(browser_name, None, webbrowser.BackgroundBrowser(path))
             webbrowser.get(browser_name).open(url)
         else:
-            print(f"⚠️ Could not find {browser_name}, using default.")
+            print(f"⚠️ Could not find '{browser_name}'. Falling back to default.")
             webbrowser.open(url)
+            
     except Exception as e:
         print(f"Error opening browser: {e}")
         webbrowser.open(url)
@@ -202,21 +216,6 @@ def open_file_path(path):
     except Exception as e:
         print(f"Error opening path: {e}")
 
-# --- SYSTEM SETTINGS ---
-def set_volume(level):
-    try:
-        devices = AudioUtilities.GetSpeakers()
-        interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-        volume = cast(interface, POINTER(IAudioEndpointVolume))
-        if str(level).lower() == "mute": volume.SetMute(1, None)
-        elif str(level).lower() == "unmute": volume.SetMute(0, None)
-        else:
-            vol_float = min(max(int(level) / 100, 0.0), 1.0)
-            volume.SetMute(0, None)
-            volume.SetMasterVolumeLevelScalar(vol_float, None)
-    except Exception as e:
-        print(f"Error setting volume: {e}")
-
 def set_brightness(level):
     try:
         sbc.set_brightness(level)
@@ -233,12 +232,15 @@ def execute_command(cmd_json):
     elif action == "check_battery": return get_battery_status()
     elif action == "check_health": return get_system_health()
     elif action == "system_sleep": system_sleep()
-    elif action == "open_url": open_browser(cmd_json.get("url"), cmd_json.get("browser_path", "default"))
+    
+    # FIX: Updated to use "browser" key correctly
+    elif action == "open_url": 
+        open_browser(cmd_json.get("url"), cmd_json.get("browser", "default"))
+        
     elif action == "close_app": close_application(cmd_json.get("app_name"))
     elif action == "open_app":
         app_name = cmd_json.get("app_name")
         print(f"🚀 Launching {app_name}...")
-        # Pressing Win key + typing name is the most universal way to open apps on Windows
         pyautogui.press("win")
         pyautogui.sleep(0.1)
         pyautogui.write(app_name)
@@ -247,6 +249,5 @@ def execute_command(cmd_json):
     elif action == "system_control":
         feature = cmd_json.get("feature")
         val = cmd_json.get("value")
-        if feature == "volume": set_volume(val)
-        elif feature == "brightness": set_brightness(val)
+        if feature == "brightness": set_brightness(val)
     elif action == "open_file": open_file_path(cmd_json.get("path"))
