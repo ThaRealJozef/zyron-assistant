@@ -172,6 +172,7 @@ Create a `.env` file:
 TELEGRAM_TOKEN=your_bot_token_here
 ALLOWED_TELEGRAM_USERNAME=your_telegram_username
 MODEL_NAME=qwen2.5-coder:7b
+OFFLINE_MODE=false # Set to true for 100% offline privacy
 LOG_LEVEL=INFO
 ```
 
@@ -234,6 +235,7 @@ zyron-assistant/
 ├── main.py                    # Application entry point
 ├── brain.py                   # AI inference engine (Ollama integration)
 ├── listener.py                # Voice wake word detection system
+├── wake_word.py               # Offline Wake Word Engine (Vosk)
 ├── tele_agent.py              # Telegram bot handler
 ├── muscles.py                 # System automation controller
 ├── memory.py                  # Conversation context manager
@@ -251,6 +253,12 @@ zyron-assistant/
 │       ├── icon16.png
 │       ├── icon48.png
 │       └── icon128.png
+├── firefox_extension/         # Firefox extension for tab monitoring
+│   ├── manifest.json
+│   ├── background.js
+│   ├── icon16.png
+│   ├── icon48.png
+│   └── icon128.png
 │
 ├── docs/                      # Documentation
 │   ├── ACTIVITIES_FEATURE_GUIDE.md
@@ -301,6 +309,15 @@ Just describe what you're looking for:
 - **Timestamped** - Know when you copied it
 - **Quick Access** - Retrieve via voice or Telegram
 
+### Firefox Integration (New)
+- **Native Support** - Tracks active tabs via local history database.
+- **Privacy Focused** - No cloud syncing required.
+
+### Offline Voice & Hybrid Mode
+- **Offline Wake Word** - Uses Vosk (local) for instant "Hey Pikachu" detection.
+- **Hybrid Command** - Falls back to online speech for accuracy, or set `OFFLINE_MODE=true` for 100% local processing.
+- **Privacy First** - You control where your audio goes.
+
 ---
 
 ## Privacy & Security
@@ -327,10 +344,13 @@ For complete browser tab tracking with URLs:
    - Chrome: `chrome://extensions`
    - Brave: `brave://extensions`
    - Edge: `edge://extensions`
+   - Firefox: `about:debugging#/runtime/this-firefox`
 
-2. Enable "Developer mode" (toggle in top-right)
+2. Enable "Developer mode" (or "Load Temporary Add-on" for Firefox)
 
-3. Click "Load unpacked" and select: `browser_extension/manifest.json`
+3. Click "Load unpacked" (Chrome) or "Load Temporary Add-on" (Firefox) and select:
+   - Chrome/Edge: `browser_extension/manifest.json`
+   - Firefox: `firefox_extension/manifest.json`
 
 4. Pin the extension to your toolbar
 
@@ -372,8 +392,8 @@ We love contributions! Here's how:
 
 ### Development Setup
 ```bash
-git clone https://github.com/YOUR_USERNAME/zyron-assistant.git
-cd zyron-assistant
+git clone https://github.com/Surajkumar5050/pikachu-assistant.git
+cd pikachu-assistant
 git checkout -b dev
 pip install -r requirements-dev.txt
 pytest tests/
@@ -406,9 +426,9 @@ Built with amazing open-source tools:
 
 ## Support & Community
 
-- **Documentation**: [Full Wiki](https://github.com/Surajkumar5050/zyron-assistant/tree/main/docs)
-- **Bug Reports**: [Issue Tracker](https://github.com/Surajkumar5050/zyron-assistant/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/Surajkumar5050/zyron-assistant/discussions)
+- **Documentation**: [Full Wiki](https://github.com/Surajkumar5050/pikachu-assistant/tree/main/docs)
+- **Bug Reports**: [Issue Tracker](https://github.com/Surajkumar5050/pikachu-assistant/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/Surajkumar5050/pikachu-assistant/discussions)
 
 ---
 
