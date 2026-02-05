@@ -13,7 +13,14 @@ try:
     HAS_OFFLINE_WAKE = True
 except Exception as e:
     print(f"⚠️ Offline Wake Engine missing: {e}")
+    HAS_OFFLINE_WAKE = True
+except Exception as e:
+    print(f"⚠️ Offline Wake Engine missing: {e}")
     HAS_OFFLINE_WAKE = False
+
+# Load Offline Mode Config
+import os
+OFFLINE_MODE = os.getenv("OFFLINE_MODE", "false").lower() == "true"
 
 # We accept variations because Google sometimes mishears "Pikachu"
 WAKE_WORDS = ["pikachu", "pika", "peek a", "pick a", "picacho", "hey you"]
@@ -86,11 +93,18 @@ def take_user_input():
             # 2. Convert to sr.AudioData
             audio_data = sr.AudioData(raw_audio, sample_rate, 2) # 2 bytes per sample (int16)
             
-            # 3. Send to Google
-            print("   -> Sending to Google Cloud...")
-            query = recognizer.recognize_google(audio_data).lower()
-            print(f"   -> Command received: {query}")
-            return query
+            # 3. SELECT MODE: Offline vs Online
+            if OFFLINE_MODE:
+                print("   -> Processing Offline (Vosk)...")
+                query = wake_engine.capture_command(timeout=5)
+                print(f"   -> Command received: {query}")
+                return query
+            else:
+                # 3. Send to Google (Hybrid)
+                print("   -> Sending to Google Cloud...")
+                query = recognizer.recognize_google(audio_data).lower()
+                print(f"   -> Command received: {query}")
+                return query
             
         except sr.UnknownValueError:
             print("   -> Google didn't understand.")
