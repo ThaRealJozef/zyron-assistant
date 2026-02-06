@@ -115,7 +115,7 @@ if not exist .env (
 :: Create the VBS launcher script
 (
     echo Set WshShell = CreateObject^("WScript.Shell"^)
-    echo WshShell.Run chr^(34^) ^& "%~dp0start_pikachu.bat" ^& chr^(34^), 0
+    echo WshShell.Run chr^(34^) ^& "%~dp0start_zyron.bat" ^& chr^(34^), 0
     echo Set WshShell = Nothing
 ) > run_silent.vbs
 
@@ -148,10 +148,10 @@ echo   [+] Creating startup shortcut...
 :: This VBS script will create a proper Windows shortcut
 (
     echo Set WshShell = WScript.CreateObject^("WScript.Shell"^)
-    echo Set oShellLink = WshShell.CreateShortcut^("%STARTUP_FOLDER%\PikachuAssistant.lnk"^)
+    echo Set oShellLink = WshShell.CreateShortcut^("%STARTUP_FOLDER%\ZyronAssistant.lnk"^)
     echo oShellLink.TargetPath = "%~dp0run_silent.vbs"
     echo oShellLink.WorkingDirectory = "%~dp0"
-    echo oShellLink.Description = "Pikachu Desktop Assistant - Auto Start"
+    echo oShellLink.Description = "Zyron Desktop Assistant - Auto Start"
     echo oShellLink.IconLocation = "shell32.dll,137"
     echo oShellLink.Save
 ) > create_startup_shortcut.vbs
@@ -163,9 +163,9 @@ cscript //nologo create_startup_shortcut.vbs
 del create_startup_shortcut.vbs
 
 :: Verify the shortcut was created
-if exist "%STARTUP_FOLDER%\PikachuAssistant.lnk" (
+if exist "%STARTUP_FOLDER%\ZyronAssistant.lnk" (
     echo   [✓] Auto-start configured successfully!
-    echo   [✓] Pikachu will now start automatically on Windows boot/restart.
+    echo   [✓] Zyron will now start automatically on Windows boot/restart.
 ) else (
     color 0C
     echo   [!] Warning: Auto-start shortcut creation failed.
@@ -177,7 +177,7 @@ if exist "%STARTUP_FOLDER%\PikachuAssistant.lnk" (
 
 echo.
 echo   ══════════════════════════════════════════════════════════════════════
-echo                   ✅  SETUP COMPLETE — PIKACHU IS READY
+echo                   ✅  SETUP COMPLETE — ZYRON IS READY
 echo   ══════════════════════════════════════════════════════════════════════
 echo.
 echo   🎯 IMPORTANT NEXT STEPS:
@@ -186,7 +186,7 @@ echo   1. Open the .env file and add your TELEGRAM_TOKEN
 echo   2. The assistant will now start automatically on every boot/restart
 echo   3. To start manually now, run: run_silent.vbs
 echo   4. To disable auto-start, delete: 
-echo      "%STARTUP_FOLDER%\PikachuAssistant.lnk"
+echo      "%STARTUP_FOLDER%\ZyronAssistant.lnk"
 echo   ══════════════════════════════════════════════════════════════════════
 echo.
 pause

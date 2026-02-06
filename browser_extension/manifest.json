@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Pikachu Activity Monitor",
+  "name": "Zyron Activity Monitor",
   "version": "1.0.0",
-  "description": "Monitors browser tabs for Pikachu Desktop Assistant",
+  "description": "Monitors browser tabs for Zyron Desktop Assistant",
   "permissions": [
     "tabs",
     "nativeMessaging"

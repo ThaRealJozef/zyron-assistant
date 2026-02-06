@@ -1,5 +1,5 @@
 """
-File Tracker Module for Pikachu Desktop Assistant
+File Tracker Module for Zyron Desktop Assistant
 Tracks all file opens/access in real-time and logs activity
 """
 

@@ -1,5 +1,5 @@
 """
-File Finder Module for Pikachu Desktop Assistant
+File Finder Module for Zyron Desktop Assistant
 Intelligent search engine that understands natural language time/type queries
 Part 2 of Context-Aware File Finder
 """

@@ -1,5 +1,5 @@
 """
-Clipboard Monitor Module for Pikachu Desktop Assistant
+Clipboard Monitor Module for Zyron Desktop Assistant
 Tracks clipboard history and provides access to copied texts
 """
 

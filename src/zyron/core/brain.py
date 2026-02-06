@@ -10,7 +10,7 @@ MODEL_NAME = os.getenv("MODEL_NAME", "qwen2.5-coder:7b")
 
 
 BASE_SYSTEM_PROMPT = """
-You are Pikachu, a smart laptop assistant with memory.
+You are Zyron, a smart laptop assistant with memory.
 Your ONLY output must be valid JSON.
 
 COMMANDS:

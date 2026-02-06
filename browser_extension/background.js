@@ -1,5 +1,5 @@
-// Background service worker for Pikachu Activity Monitor
-console.log("Pikachu Activity Monitor - Background Service Started");
+// Background service worker for Zyron Activity Monitor
+console.log("Zyron Activity Monitor - Background Service Started");
 
 // Listen for messages from native host or popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -16,7 +16,7 @@ async function getAllTabs() {
   try {
     const windows = await chrome.windows.getAll({ populate: true });
     const allTabs = [];
-    
+
     for (const window of windows) {
       for (const tab of window.tabs) {
         allTabs.push({
@@ -29,7 +29,7 @@ async function getAllTabs() {
         });
       }
     }
-    
+
     return allTabs;
   } catch (error) {
     console.error("Error getting tabs:", error);
@@ -40,7 +40,7 @@ async function getAllTabs() {
 // Listen for native messaging connection
 chrome.runtime.onConnectExternal.addListener((port) => {
   console.log("Native messaging connection established");
-  
+
   port.onMessage.addListener(async (msg) => {
     if (msg.command === "get_tabs") {
       const tabs = await getAllTabs();
