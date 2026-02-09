@@ -98,3 +98,8 @@ def read_page(tab_id=None):
 def scan_page(tab_id=None):
     return send_browser_command("scan", tabId=tab_id)
 
+def press_key(selector, key, tab_id=None):
+    if str(selector).isdigit():
+        selector = f'[data-zyron-id="{selector}"]'
+    return send_browser_command("press_key", selector=selector, key=key, tabId=tab_id)
+

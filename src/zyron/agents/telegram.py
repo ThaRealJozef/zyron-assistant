@@ -6,6 +6,7 @@ from telegram import Update, constants, ReplyKeyboardMarkup, KeyboardButton, Inl
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, CommandHandler, CallbackQueryHandler, filters
 from zyron.core.brain import process_command
 from zyron.agents.system import execute_command, capture_webcam
+import zyron.features.browser_control as browser_control
 import zyron.core.memory as memory
 import zyron.features.activity as activity_monitor  # Needed to format the output text
 import zyron.features.clipboard as clipboard_monitor  # For clipboard history
