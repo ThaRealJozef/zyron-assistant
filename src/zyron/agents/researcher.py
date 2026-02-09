@@ -57,15 +57,27 @@ def perform_research(query):
         print("   → Firefox is running. Attempting Stealth Browser Bridge...")
         tab_id = create_tab(search_url, active=False)
         if tab_id:
-            print(f"   → Created Stealth Tab (ID: {tab_id}). Waiting for load...")
-            time.sleep(4) # Increased wait for slow devs
-            result = read_page(tab_id=tab_id)
-            if result and result.get("success"):
-                content = result.get("content", "")
-                method = "Stealth Browser (Firefox)"
-                print("   ✅ Content extracted via Browser.")
-            else:
-                print(f"   ⚠️ Browser Read Failed: {result.get('error') if result else 'No result'}")
+            print(f"   → Created Stealth Tab (ID: {tab_id}).")
+            
+            # Robust Extraction Loop (Retry for slow loads)
+            for attempt in range(1, 4):
+                print(f"   → Load attempt {attempt}/3...")
+                time.sleep(3) # Wait between checks
+                
+                result = read_page(tab_id=tab_id)
+                if result and result.get("success"):
+                    raw_content = result.get("content", "")
+                    # Simple validation: Did we actually get search results?
+                    if len(raw_content) > 500: # Typical Google result pages are large
+                        content = raw_content
+                        method = "Stealth Browser (Firefox)"
+                        print(f"   ✅ Content extracted via Browser (Size: {len(content)} chars).")
+                        break
+                    else:
+                        print("   ⚠️ Content too short, page might still be loading...")
+                else:
+                    print(f"   ⚠️ Read failed: {result.get('error') if result else 'No response'}")
+            
             close_tab(tab_id)
         else:
             print("   ⚠️ Failed to create tab. Native Host might not be registered.")
@@ -84,15 +96,19 @@ def perform_research(query):
                     return "⚠️ Stealth Research was blocked by Google security. Please open Firefox and try again (ensure the extension is active)."
                 
                 content = clean_html(html)
-                method = "Headless Fallback (Requests)"
-                print("   ✅ Content extracted via Headless.")
+                # Validation for headless too
+                if len(content) < 200:
+                    print("   ⚠️ Headless extraction too small. Likely a block page.")
+                else:
+                    method = "Headless Fallback (Requests)"
+                    print("   ✅ Content extracted via Headless.")
             else:
                 print(f"   ❌ Headless Failed: Status {response.status_code}")
         except Exception as e:
             print(f"   ❌ Headless error: {e}")
 
     if not content:
-        return "❌ I tried both browser and network research but couldn't get any results. Please check your internet or ensure Firefox is open with the Zyron extension."
+        return "❌ I tried both browser and network research but couldn't get any results. Please ensure Firefox is open with the Zyron extension for the best results."
 
     # 2. Analyze with LLM
     now = datetime.now().strftime("%A, %B %d, %Y")
@@ -113,7 +129,7 @@ def perform_research(query):
         return answer
     except Exception as e:
         print(f"❌ Synthesis error: {e}")
-        return f"⚠️ I found information via {method} but had trouble processing it with {MODEL_NAME}. Check if the model is pulled correctly."
+        return f"⚠️ I found information via {method} but had trouble processing it. Check if Ollama is running."
 
 if __name__ == "__main__":
     print(perform_research("Who is CEO of OpenAI?"))
