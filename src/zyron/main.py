@@ -3,11 +3,15 @@ from .core.voice import listen_for_command, take_user_input, speak
 from .core.brain import process_command
 from .agents.system import execute_command
 from .utils.ui import print_header, print_status, print_command, print_zyron, print_error, Colors
+from .utils.env_check import check_dependencies
 
 # Import file tracker - it will auto-start when imported
 import zyron.features.files.tracker as file_tracker
 
 def main():
+    # Final check before startup
+    check_dependencies()
+    
     print_header()
     print_status("✅", "Voice Engine Ready (Offline/Online)", Colors.GREEN)
     print_status("👁️", "Clipboard Monitor Active", Colors.GREEN)

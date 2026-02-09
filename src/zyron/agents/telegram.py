@@ -11,6 +11,10 @@ import zyron.features.activity as activity_monitor  # Needed to format the outpu
 import zyron.features.clipboard as clipboard_monitor  # For clipboard history
 import zyron.features.files.tracker as file_tracker  # <--- NEW IMPORT: THIS STARTS THE FILE TRACKER AUTOMATICALLY
 import zyron.features.focus_mode as focus_mode # <--- Feature #11: Focus Mode
+from zyron.utils.env_check import check_dependencies
+
+# Run health check before anything else
+check_dependencies()
 
 load_dotenv()
 TOKEN = os.getenv("TELEGRAM_TOKEN")
