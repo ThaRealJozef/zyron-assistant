@@ -136,56 +136,50 @@ ZYRON isn't just another assistant - it's your personal AI that lives entirely o
 
 ---
 
-## Quick Start
+## 🚀 The Ultimate 0-100 Setup Guide
 
-### Prerequisites
+Follow these stages to get Zyron running perfectly on your machine.
 
-| Requirement | Version | Download |
-|-------------|---------|----------|
-| **Windows** | 10/11 (64-bit) | Pre-installed |
-| **Python** | 3.10+ | [python.org](https://www.python.org/downloads/) |
-| **Ollama** | Latest | [ollama.com](https://ollama.com/) |
-| **Telegram Bot** | Token | [@BotFather](https://t.me/BotFather) |
+### Stage 1: The Engine (AI Infrastructure)
+1.  **Download Ollama**: Visit [ollama.com](https://ollama.com) and install it.
+2.  **Pull the Model**: Open your terminal and run:
+    ```bash
+    ollama pull qwen2.5-coder:7b
+    ```
+    *(This model is optimized for tool-calling and system automation)*
 
-### Installation (5 Minutes)
+### Stage 2: The Core (Installation)
+1.  **Clone & Enter**:
+    ```bash
+    git clone https://github.com/Surajkumar5050/zyron-assistant.git
+    cd zyron-assistant
+    ```
+2.  **Automated Installer**: Run the setup script. It creates your environment and installs all 30+ required libraries.
+    ```bash
+    setup.bat
+    ```
 
-```bash
-# 1. Clone the repository
-git clone https://github.com/Surajkumar5050/zyron-assistant.git
-cd zyron-assistant
+### Stage 3: The Bridge (Firefox Integration) 🦊
+For live browser monitoring and stealth research:
+1.  **Add-on**: Download `zyron_activity_monitor.xpi` from the [Releases](https://github.com/Surajkumar5050/zyron-assistant/releases) section.
+2.  **Install**: In Firefox, go to `about:addons` -> Gear Icon ⚙️ -> **Install Add-on From File...**.
+3.  **Secure Bridge**: Run the registration script to connect Firefox to your PC:
+    ```bash
+    python src/zyron/scripts/register_native_host.py
+    ```
 
-# 2. Run the automated installer
-setup.bat
+### Stage 4: Remote Control (Telegram)
+1.  **Create Bot**: Message [@BotFather](https://t.me/BotFather) on Telegram and get your `API TOKEN`.
+2.  **Configure `.env`**: Open the `.env` file created by the installer and fill it in:
+    ```env
+    TELEGRAM_TOKEN=your_bot_token_here
+    ALLOWED_TELEGRAM_USERNAME=your_telegram_username
+    MODEL_NAME=qwen2.5-coder:7b
+    ```
 
-# That's it! The installer handles:
-# ✓ Python environment setup (Python 3.9+)
-# ✓ Package installation (pip install -e .)
-# ✓ AI model download (qwen2.5-coder:7b)
-# ✓ Windows startup integration
-# ✓ Stealth mode configuration
-```
-
-### Configuration
-
-Create a `.env` file:
-
-```env
-TELEGRAM_TOKEN=your_bot_token_here
-ALLOWED_TELEGRAM_USERNAME=your_telegram_username
-MODEL_NAME=qwen2.5-coder:7b
-OFFLINE_MODE=false # Set to true for 100% offline privacy
-LOG_LEVEL=INFO
-```
-
-### Launch
-
-```bash
-# Visible mode (for testing)
-start_zyron.bat
-
-# Stealth mode (runs in background)
-run_silent.vbs
-```
+### Stage 5: Launch (The Experience)
+*   **Visible Mode (Testing)**: Run `start_zyron.bat` to see the console and voice feedback.
+*   **Stealth Mode (Professional)**: Run `run_silent.vbs`. Zyron will move to the background and wait for your voice or Telegram commands without taking up window space.
 
 ---
 
