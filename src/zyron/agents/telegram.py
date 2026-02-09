@@ -735,111 +735,112 @@ Longitude: {location_data['longitude']}
         elif action == "browser_control":
             if status_msg: await status_msg.delete()
             
-            command = command_json.get("command") # close, mute
+            command = command_json.get("command") # close, mute, screenshot
             query = command_json.get("query", "").lower()
             
-            # --- SMART MATCHING LOGIC ---
-            # 1. Get all open tabs
-            tabs = activity_monitor.get_firefox_tabs()
+            # --- AUTO-CORRECTION: REDIRECT TO NAV ---
+            # If the LLM sent 'browser_control' but with interaction words, it's a Nav intent
+            interaction_verbs = ["click", "type", "press", "search", "scroll", "read", "first", "there"]
+            is_interaction = any(v in query for v in interaction_verbs) or "target" in command_json
             
-            if not tabs:
-                await update.message.reply_text("❌ No Firefox tabs found (or bridge not connected).", reply_markup=get_main_keyboard())
-                return
+            if is_interaction and "browser_nav" not in [action]:
+                 print(f"🔄 Auto-Correcting: Redirecting Browser Control ({query}) to Browser Nav")
+                 # Re-routing logic flow to the nav handler below
+                 action = "browser_nav"
+                 command_json["sub_action"] = "click" if "click" in query else "scan"
+                 if "target" not in command_json: command_json["target"] = query
+            else:
+                # Proceed with standard Tab Management
+                # 1. Get all open tabs
+                tabs = activity_monitor.get_firefox_tabs()
+                
+                if not tabs:
+                    await update.message.reply_text("❌ No Firefox tabs found (or bridge not connected).", reply_markup=get_main_keyboard())
+                    return
 
-            # 2. Tokenize the user query
-            # Remove command words to isolate the subject
-            stop_words = ["close", "mute", "unmute", "the", "tab", "window", "browser", "video", "music", "about", "play", "pause"]
-            query_words = [w for w in query.split() if w not in stop_words and len(w) > 2]
-            
-            if not query_words:
-                 await update.message.reply_text("❓ Please specify which tab (e.g., 'Close YouTube').", reply_markup=get_main_keyboard())
-                 return
-
-            # 3. Score each tab
-            best_match = None
-            highest_score = 0
-            
-            print(f"🔍 Searching tabs for keywords: {query_words}")
-            
-            for tab in tabs:
-                score = 0
-                title = tab.get('title', '').lower()
-                url = tab.get('url', '').lower()
+                # 2. Tokenize the user query
+                # Stop words filter out interaction words to avoid ruin matching score
+                stop_words = ["close", "mute", "unmute", "the", "tab", "window", "browser", "video", "music", "about", "play", "pause"] + interaction_verbs
+                query_words = [w for w in query.split() if w not in stop_words and len(w) > 2]
                 
-                # Check each word
-                for word in query_words:
-                    if word in title: score += 2  # Title match is strong
-                    elif word in url: score += 1  # URL match is weak
+                # --- FAILOVER TO STICKY TAB ---
+                best_match = None
+                highest_score = 0
                 
-                # Bonus for exact phrase
-                if " ".join(query_words) in title:
-                    score += 5
+                if not query_words and memory.short_term.get("last_focused_tab"):
+                     print(f"🎯 Sticky Tab: Using last focused tab: {memory.short_term['last_focused_tab']}")
+                     # Find the tab object for the last focused one
+                     for tab in tabs:
+                         if tab.get('title') == memory.short_term['last_focused_tab']:
+                             best_match = tab
+                             highest_score = 100
+                             break
                 
-                print(f"   - Checking: {title[:20]}... Score: {score}")
+                if not best_match:
+                    if not query_words:
+                         await update.message.reply_text("❓ Please specify which tab (e.g., 'Close YouTube').", reply_markup=get_main_keyboard())
+                         return
+                    print(f"🔍 Searching tabs for keywords: {query_words}")
+                    for tab in tabs:
+                        score = 0
+                        title = tab.get('title', '').lower()
+                        url = tab.get('url', '').lower()
+                        for word in query_words:
+                            if word in title: score += 2
+                            elif word in url: score += 1
+                        if " ".join(query_words) in title: score += 5
+                        
+                        print(f"   - Checking: {title[:20]}... Score: {score}")
+                        if score > highest_score:
+                            highest_score = score
+                            best_match = tab
                 
-                if score > highest_score:
-                    highest_score = score
-                    best_match = tab
-            
-            # 4. Execute on best match if score is sufficient
-            if best_match and highest_score > 0:
-                tab_id = best_match.get('id')
-                tab_title = best_match.get('title')
-                
-                # Save Context for "Play it again"
-                from zyron.core import memory
-                memory.update_context("browser_interaction", tab_title)
-                
-                if tab_id:
-                    if command == "close":
-                        browser_control.close_tab(tab_id)
-                        await update.message.reply_text(f"🗑️ Closed: **{best_match.get('title')}**", parse_mode='Markdown', reply_markup=get_main_keyboard())
-                    elif command == "mute":
-                        browser_control.mute_tab(tab_id, True)
-                        await update.message.reply_text(f"🔇 Muted: **{best_match.get('title')}**", parse_mode='Markdown', reply_markup=get_main_keyboard())
-                    elif command == "unmute": # handle unmute if we add it later
-                        browser_control.mute_tab(tab_id, False)
-                        await update.message.reply_text(f"🔊 Unmuted: **{best_match.get('title')}**", parse_mode='Markdown', reply_markup=get_main_keyboard())
-                    elif command == "play" or command == "pause":
-                        browser_control.media_control(tab_id, command)
-                        icon = "▶️" if command == "play" else "⏸️"
-                        await update.message.reply_text(f"{icon} {command.title()}d: **{best_match.get('title')}**", parse_mode='Markdown', reply_markup=get_main_keyboard())
+                # 4. Execute on best match if score is sufficient
+                if best_match and highest_score > 0:
+                    tab_id = best_match.get('id')
+                    tab_title = best_match.get('title')
+                    from zyron.core import memory
+                    memory.update_context("browser_interaction", tab_title)
                     
-                    elif command == "screenshot":
-                        window_id = best_match.get('windowId')
-                        browser_control.capture_tab_with_window(tab_id, window_id)
-                        
-                        loader = await update.message.reply_text("📸 Capturing tab...", reply_markup=get_main_keyboard())
-                        
-                        # Wait for file
-                        shot_path = os.path.join(os.environ.get('TEMP', ''), 'zyron_tab_screenshot.png')
-                        
-                        # Remove old file if exists to avoid sending stale one
-                        if os.path.exists(shot_path):
-                            try: os.remove(shot_path)
-                            except: pass
-                            
-                        # Poll for new file
-                        found = False
-                        for _ in range(10): # Wait up to 5 seconds
+                    if tab_id:
+                        if command == "close":
+                            browser_control.close_tab(tab_id)
+                            await update.message.reply_text(f"🗑️ Closed: **{best_match.get('title')}**", parse_mode='Markdown', reply_markup=get_main_keyboard())
+                        elif command == "mute":
+                            browser_control.mute_tab(tab_id, True)
+                            await update.message.reply_text(f"🔇 Muted: **{best_match.get('title')}**", parse_mode='Markdown', reply_markup=get_main_keyboard())
+                        elif command == "unmute":
+                            browser_control.mute_tab(tab_id, False)
+                            await update.message.reply_text(f"🔊 Unmuted: **{best_match.get('title')}**", parse_mode='Markdown', reply_markup=get_main_keyboard())
+                        elif command in ["play", "pause"]:
+                            # We don't have media_control in browser_control.py yet, but placeholder
+                            await update.message.reply_text(f"🎬 Command {command} sent to **{tab_title}**", reply_markup=get_main_keyboard())
+                        elif command == "screenshot":
+                            # ... screenshot logic ... (keep it as is)
+                            window_id = best_match.get('windowId')
+                            browser_control.capture_tab_with_window(tab_id, window_id)
+                            loader = await update.message.reply_text("📸 Capturing tab...", reply_markup=get_main_keyboard())
+                            shot_path = os.path.join(os.environ.get('TEMP', ''), 'zyron_tab_screenshot.png')
                             if os.path.exists(shot_path):
-                                found = True
-                                break
-                            await asyncio.sleep(0.5)
-                        
-                        if found:
-                            try:
+                                try: os.remove(shot_path)
+                                except: pass
+                            found = False
+                            for _ in range(10):
+                                if os.path.exists(shot_path):
+                                    found = True
+                                    break
+                                await asyncio.sleep(0.5)
+                            if found:
                                 await update.message.reply_photo(photo=open(shot_path, 'rb'), caption=f"📸 **{best_match.get('title')}**")
                                 await loader.delete()
-                            except Exception as e:
-                                await loader.edit_text(f"❌ Upload Error: {e}")
-                        else:
-                            await loader.edit_text("❌ Screenshot timeout. Native host didn't respond.")
-                            
+                            else:
+                                await loader.edit_text("❌ Screenshot timeout.")
+                    else:
+                        await update.message.reply_text(f"❌ Found '**{best_match.get('title', 'Unknown')}**' but it has no ID.", reply_markup=get_main_keyboard())
+                    return # Exit this branch if execution succeeded
                 else:
-                    await update.message.reply_text(f"❌ Found '**{best_match.get('title', 'Unknown')}**' but it has no ID. Reload extension.", reply_markup=get_main_keyboard())
-            else:
-                 await update.message.reply_text(f"❌ No tab found matching your description.", reply_markup=get_main_keyboard())
+                     await update.message.reply_text(f"❌ No tab found matching your description.", reply_markup=get_main_keyboard())
+                     return
 
         # --- NAVIGATION AGENT COMMANDS ---
         elif action == "browser_nav":

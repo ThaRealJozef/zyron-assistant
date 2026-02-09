@@ -50,9 +50,9 @@ def get_context_string():
     [CURRENT CONTEXT STATE]
     - Current Time: {current_time}
     - KNOWN USER INFO: {long_term_data}
+    - >>> LAST ACTIVE BROWSER TAB: {short_term['last_focused_tab']} <<<
     - Last App Opened: {short_term['last_app_opened']}
     - Last Browser Used: {short_term['last_browser_used']}
-    - Last Focused Tab: {short_term['last_focused_tab']}
     - Last File/Folder: {short_term['last_file_path']}
     """
 

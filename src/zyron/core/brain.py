@@ -67,15 +67,15 @@ COMMANDS:
 16. Chat:  {"action": "general_chat", "response": "text"}
 
 *** PRIORITY RULE: "CLICK ON X" ***
-If user says "click on [something]", "press [something]", or "tap [something]":
-ALWAYS use browser_nav with sub_action="click", NOT browser_control!
+If user says "click on [something]", "press [something]", "tap [something]", "type [text]", or mentions "search" in the context of input:
+ALWAYS use browser_nav with sub_action="click" or "type", NOT browser_control!
 - "click on music" -> {"action": "browser_nav", "sub_action": "click", "target": "music"}
-- "click on login" -> {"action": "browser_nav", "sub_action": "click", "target": "login"}
-browser_control is ONLY for "close TAB", "mute TAB" - actual tab operations!
+- "type Hello" -> {"action": "browser_nav", "sub_action": "type", "target": "search", "text": "Hello"}
+browser_control is ONLY for "close TAB", "mute TAB", or "screenshot TAB" - operations on the TAB itself!
 
-17. Browser Tab Control: {"action": "browser_control", "command": "close/mute", "query": "which tab"}
-    (Triggers: "close youtube TAB", "mute spotify TAB", "close the TAB")
-    *** ONLY when user explicitly says "TAB" or "close/mute" ***
+17. Browser Tab Control: {"action": "browser_control", "command": "close/mute/screenshot", "query": "which tab"}
+    (Triggers: "close youtube TAB", "mute spotify TAB", "screenshot the TAB")
+    *** ONLY when user explicitly refers to the TAB or its status (close/mute/snap) ***
 
 18. Power Control: 
     - Shutdown: {"action": "shutdown_pc"} (Triggers: shutdown, turn off computer, kill power)
@@ -88,40 +88,18 @@ browser_control is ONLY for "close TAB", "mute TAB" - actual tab operations!
     - Click button/link: {"action": "browser_nav", "sub_action": "click", "target": "button text"}
     - Type in field:     {"action": "browser_nav", "sub_action": "type", "target": "field name", "text": "what to type"}
     (Triggers: "click on X", "click the button", "scroll down", "type Y in search", "read page")
-    Examples:
-    - "click on shorts" -> {"action": "browser_nav", "sub_action": "click", "target": "shorts"}
-    - "click the login button" -> {"action": "browser_nav", "sub_action": "click", "target": "login"}
 
 20. Web Research: {"action": "web_research", "query": "search query"}
     (Triggers: "Who is...", "What is...", "How much is...", "Look up...", "Research...", "Find info about...")
-    *** Use this when the user asks a QUESTION that requires browsing the web ***
 
 *** MULTI-COMMAND CHAINING ***
 If the user wants MULTIPLE actions in sequence, return a JSON ARRAY of actions.
-Keywords like "and then", "then", "after that", "also" indicate chaining.
-
-Example 1: "Go to Google and search Pikachu"
-[
-  {"action": "open_url", "url": "https://google.com", "browser": "default"},
-  {"action": "browser_nav", "sub_action": "type", "target": "search", "text": "Pikachu"}
-]
-
-Example 2: "Screenshot my YouTube tab and then mute it"
-[
-  {"action": "take_screenshot"},
-  {"action": "browser_control", "command": "mute", "query": "youtube"}
-]
-
-Example 3: "Open Notepad and type Hello World"
-[
-  {"action": "open_app", "app_name": "notepad"},
-  {"action": "browser_nav", "sub_action": "type", "target": "notepad", "text": "Hello World"}
-]
+Example: "Open YouTube and search Pikachu" -> [{"action": "open_url", ...}, {"action": "browser_nav", "sub_action": "type", ...}]
 
 *** CRITICAL RULE: CONTEXT AWARENESS ***
-Use the [CURRENT CONTEXT STATE] below to resolve words like "it", "that", "the app", "the folder".
-- If user says "Close it" and Last Focused Tab is "YouTube" -> {"action": "browser_control", "command": "close", "query": "YouTube"} (PRIORITY over close_app)
-- If user says "Close it" and Last App Opened is "Chrome" -> {"action": "close_app", "app_name": "Chrome"}
+Use the [CURRENT CONTEXT STATE] to resolve "it", "that", "there".
+- If user says "click it" and Last Focused Tab is "YouTube" -> Assume the user is talking about the content inside that YouTube tab.
+- NEVER used browser_control if the intent is to INTERACT with content.
 """
 
 def process_command(user_input):
