@@ -21,30 +21,30 @@ title ⚡ ZYRON ASSISTANT — PREMIUM SETUP ⚡
 
 cls
 :: Render Big Zyron Logo using single-line stable PowerShell call
-powershell -NoProfile -Command "Write-Host ' '; Write-Host '   .──────────────────────────────────────────────────────────.' -ForegroundColor Magenta; Write-Host '   │                                                          │' -ForegroundColor Magenta; Write-Host '   │   ███████╗██╗   ██╗██████╗  ██████╗ ███╗   ██╗           │' -ForegroundColor Magenta; Write-Host '   │   ╚══███╔╝╚██╗ ██╔╝██╔══██╗██╔═══██╗████╗  ██║           │' -ForegroundColor Magenta; Write-Host '   │     ███╔╝  ╚████╔╝ ██████╔╝██║   ██║██╔██╗ ██║           │' -ForegroundColor Magenta; Write-Host '   │    ███╔╝    ╚██╔╝  ██╔══██╗██║   ██║██║╚██╗██║           │' -ForegroundColor Magenta; Write-Host '   │   ███████╗   ██║   ██║  ██║╚██████╔╝██║ ╚████║           │' -ForegroundColor Magenta; Write-Host '   │   ╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝           │' -ForegroundColor Magenta; Write-Host '   │                                                          │' -ForegroundColor Magenta; Write-Host '   │            ⚡ Z Y R O N   A S S I S T A N T ⚡             │' -ForegroundColor Cyan; Write-Host '   │                                                          │' -ForegroundColor Magenta; Write-Host '   ' +  [char]39 + '──────────────────────────────────────────────────────────' + [char]39  -ForegroundColor Magenta"
+powershell -NoProfile -Command "Write-Host ' '; Write-Host '   .──────────────────────────────────────────────────────────.' -ForegroundColor Magenta; Write-Host '   │                                                          │' -ForegroundColor Magenta; Write-Host '   │   ███████╗██╗   ██╗██████╗  ██████╗ ███╗   ██╗           │' -ForegroundColor Magenta; Write-Host '   │   ╚══███╔╝╚██╗ ██╔╝██╔══██╗██╔═══██╗████╗  ██║           │' -ForegroundColor Magenta; Write-Host '   │     ███╔╝  ╚████╔╝ ██████╔╝██║   ██║██╔██╗ ██║           │' -ForegroundColor Magenta; Write-Host '   │    ███╔╝    ╚██╔╝  ██╔══██╗██║   ██║██║╚██╗██║           │' -ForegroundColor Magenta; Write-Host '   │   ███████╗   ██║   ██║  ██║╚██████╔╝██║ ╚████║           │' -ForegroundColor Magenta; Write-Host '   │   ╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝           │' -ForegroundColor Magenta; Write-Host '   │                                                          │' -ForegroundColor Magenta; Write-Host '   │            ⚡ Z Y R O N   A S S I S T A N T ⚡             │' -ForegroundColor Cyan; Write-Host '   │                                                          │' -ForegroundColor Magenta; Write-Host '   .──────────────────────────────────────────────────────────.' -ForegroundColor Magenta"
 
 
 echo.
-echo   %C_CYN%  ══════════════════════════════════════════════════
-echo            %C_BCYN%⚡ SYSTEM INITIALIZATION ENGAGED ⚡%C_CYN%
-echo     ══════════════════════════════════════════════════%C_RST%
+echo   !C_CYN!  ══════════════════════════════════════════════════
+echo            !C_BCYN!⚡ SYSTEM INITIALIZATION ENGAGED ⚡!C_CYN!
+echo     ══════════════════════════════════════════════════!C_RST!
 echo.
 
 :: ===================== STEP 1 - PYTHON CHECK =====================
-echo   %C_CYN%[1/6]%C_RST% Scanning for Python Environment...
+echo   !C_CYN![1/6]!C_RST! Scanning for Python Environment...
 
 :: Check for Python 3.11 specifically as it's the target
 py -3.11 --version >nul 2>&1
 if not errorlevel 1 (
     set "PYTHON_CMD=py -3.11"
-    echo     %C_GRN%[✓] Found Python 3.11 (via Launcher)%C_RST%
+    echo     !C_GRN![✓] Found Python 3.11 ^(via Launcher^)!C_RST!
     goto :FoundPython
 )
 
 for /f "tokens=2 delims= " %%v in ('python --version 2^>nul') do set CUR_VER=%%v
 if "!CUR_VER:~0,4!"=="3.11" (
     set "PYTHON_CMD=python"
-    echo     %C_GRN%[✓] Default Python is 3.11%C_RST%
+    echo     !C_GRN![✓] Default Python is 3.11!C_RST!
     goto :FoundPython
 )
 
@@ -52,7 +52,7 @@ if "!CUR_VER:~0,4!"=="3.10" set "PYTHON_CMD=python" & goto :FoundPython
 if "!CUR_VER:~0,4!"=="3.12" set "PYTHON_CMD=python" & goto :FoundPython
 
 echo.
-echo     %C_RED%[X] CRITICAL: Python 3.11 not discovered!%C_RST%
+echo     !C_RED![X] CRITICAL: Python 3.11 not discovered!!C_RST!
 echo.
 pause
 exit /b 1
@@ -61,74 +61,74 @@ exit /b 1
 echo.
 
 :: ===================== STEP 2 - ENVIRONMENT SETUP =====================
-echo   %C_CYN%[2/6]%C_RST% Configuring Workspace...
+echo   !C_![2/6]!C_! Configuring Workspace...
 
 if exist venv (
-    echo     %C_GRAY%[i] Closing active processes...%C_RST%
+    echo     !C_![i] Closing active processes...!C_!
     taskkill /f /im python.exe /t >nul 2>&1
     taskkill /f /im pythonw.exe /t >nul 2>&1
     timeout /t 1 /nobreak >nul
-    echo     %C_GRAY%[i] Refreshing old files...%C_RST%
+    echo     !C_![i] Refreshing old files...!C_!
     rmdir /s /q venv >nul 2>&1
     if exist venv (
         echo.
-        echo     %C_RED%[!] ERROR: Access Denied to 'venv' folder.%C_RST%
-        echo     %C_YLW%Please close VS Code or any other terminal using this folder.%C_RST%
+        echo     !C_![!] ERROR: Access Denied to 'venv' folder.!C_!
+        echo     !C_!Please close VS Code or any other terminal using this folder.!C_!
         echo.
         pause
         exit /b 1
     )
 )
 
-echo     %C_YLW%[+] Building virtual environment...%C_RST%
+echo     !C_![+] Building virtual environment...!C_!
 %PYTHON_CMD% -m venv venv
 
 if errorlevel 1 (
     echo.
-    echo     %C_RED%[X] Workspace creation FAILED!%C_RST%
+    echo     !C_![X] Workspace creation FAILED!!C_!
     echo.
     pause
     exit /b 1
 )
-echo     %C_GRN%[✓] Workspace ready.%C_RST%
+echo     !C_![✓] Workspace ready.!C_!
 echo.
 
 :: ===================== STEP 3 - DEPENDENCIES =====================
-echo   %C_CYN%[3/6]%C_RST% Deploying Neural Modules...
+echo   !C_![3/6]!C_! Deploying Neural Modules...
 call venv\Scripts\activate
 python -m pip install --upgrade pip --quiet
 pip install -e .
 
 if errorlevel 1 (
     echo.
-    echo     %C_RED%[X] Submodule installation FAILED!%C_RST%
+    echo     !C_![X] Submodule installation FAILED!!C_!
     echo.
     pause
     exit /b 1
 )
-echo     %C_GRN%[✓] Systems online.%C_RST%
+echo     !C_![✓] Systems online.!C_!
 echo.
 
 :: ===================== STEP 4 - OLLAMA CHECK =====================
-echo   %C_CYN%[4/6]%C_RST% Verifying AI Engine (Ollama)...
+echo   !C_![4/6]!C_! Verifying AI Engine (Ollama)...
 ollama --version >nul 2>&1
 if errorlevel 1 (
-    echo     %C_YLW%[!] Ollama disconnected. Local AI suspended.%C_RST%
-    echo     %C_GRAY%Install manually from ollama.com for full capability.%C_RST%
+    echo     !C_![!] Ollama disconnected. Local AI suspended.!C_!
+    echo     !C_!Install manually from ollama.com for full capability.!C_!
 ) else (
-    echo     %C_GRN%[✓] Neural engine linked.%C_RST%
+    echo     !C_![✓] Neural engine linked.!C_!
 )
 echo.
 
 :: ===================== STEP 5 - SILENT LAUNCHER =====================
-echo   %C_CYN%[5/6]%C_RST% Configuring Stealth Protocols...
+echo   !C_![5/6]!C_! Configuring Stealth Protocols...
 
 if not exist .env (
     (
         echo TELEGRAM_TOKEN=PASTE_TOKEN_HERE
         echo MODEL_NAME=qwen2.5-coder:7b
     ) > .env
-    echo     %C_YLW%[!] .env generated. TELEGRAM_TOKEN REQUIRED.%C_RST%
+    echo     !C_![!] .env generated. TELEGRAM_TOKEN REQUIRED.!C_!
 )
 
 (
@@ -137,11 +137,11 @@ if not exist .env (
     echo Set WshShell = Nothing
 ) > run_silent.vbs
 
-echo     %C_GRN%[✓] Stealth launcher primed.%C_RST%
+echo     !C_![✓] Stealth launcher primed.!C_!
 echo.
 
 :: ===================== STEP 6 - AUTO-START SETUP =====================
-echo   %C_CYN%[6/6]%C_RST% Finalizing Startup Sequence...
+echo   !C_![6/6]!C_! Finalizing Startup Sequence...
 
 set "STARTUP_FOLDER=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup"
 
@@ -150,19 +150,19 @@ if exist "%STARTUP_FOLDER%\PikachuAgent.lnk" del "%STARTUP_FOLDER%\PikachuAgent.
 if exist "%STARTUP_FOLDER%\ZyronAssistant.lnk" del "%STARTUP_FOLDER%\ZyronAssistant.lnk" >nul 2>&1
 
 echo.
-echo     %C_BCYN%[?] SYSTEM PROMPT:%C_RST%
-echo     %C_CYN%Activate automatic resonance on PC boot?%C_RST%
+echo     !C_![?] SYSTEM PROMPT:!C_!
+echo     !C_!Activate automatic resonance on PC boot?!C_!
 echo.
 choice /c YN /m "     Enable Autostart? "
 
 if errorlevel 2 (
     echo.
-    echo     %C_GRAY%[-] Startup resonance bypassed.%C_RST%
+    echo     !C_![-] Startup resonance bypassed.!C_!
     goto :FinishSetup
 )
 
 echo.
-echo     %C_YLW%[+] Deploying startup artifact...%C_RST%
+echo     !C_![+] Deploying startup artifact...!C_!
 
 (
     echo Set WshShell = WScript.CreateObject^("WScript.Shell"^)
@@ -178,25 +178,25 @@ cscript //nologo create_startup_shortcut.vbs
 del create_startup_shortcut.vbs
 
 if exist "%STARTUP_FOLDER%\ZyronAssistant.lnk" (
-    echo     %C_GRN%[✓] Autostart successfully armed!%C_RST%
+    echo     !C_![✓] Autostart successfully armed!!C_!
 ) else (
-    echo     %C_RED%[!] Warning: Shortcut deployment failed.%C_RST%
+    echo     !C_![!] Warning: Shortcut deployment failed.!C_!
 )
 
 :FinishSetup
 echo.
-echo   %C_MAG%  ══════════════════════════════════════════════════
-echo                %C_BMAG%✅ SYSTEM READY — ZYRON ACTIVE%C_MAG%
-echo     ══════════════════════════════════════════════════%C_RST%
+echo   !C_!  ══════════════════════════════════════════════════
+echo                !C_!✅ SYSTEM READY — ZYRON ACTIVE!C_!
+echo     ══════════════════════════════════════════════════!C_!
 echo.
-echo   %C_BCYN%  🎯 MISSION PARAMETERS:%C_RST%
-echo   %C_CYN%  ──────────────────────────────────────────────────%C_RST%
+echo   !C_!  🎯 MISSION PARAMETERS:!C_!
+echo   !C_!  ──────────────────────────────────────────────────!C_!
 
 call :Typewriter "   - Credentials: Check .env for Telegram Token"
 call :Typewriter "   - Quick Launch: Run run_silent.vbs"
 call :Typewriter "   - Management: Rerun setup to reconfigure"
 
-echo   %C_CYN%  ──────────────────────────────────────────────────%C_RST%
+echo   !C_!  ──────────────────────────────────────────────────!C_!
 echo.
 pause
 exit /b
@@ -206,3 +206,4 @@ set "text=%~1"
 powershell -NoProfile -Command "$text='%text%'; for ($i=0; $i -lt $text.Length; $i++) { Write-Host $text[$i] -ForegroundColor Cyan -NoNewline; Start-Sleep -Milliseconds 15 }"
 echo.
 exit /b
+
