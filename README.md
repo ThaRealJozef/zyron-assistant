@@ -297,6 +297,10 @@ zyron-assistant/
 └── LICENSE                    # MIT License
 ```
 
+<div align="center">
+  <img src="markdown_themes/zyron_architecture.svg" alt="ZYRON Architecture" width="100%">
+</div>
+
 ---
 
 ## Latest Features (v1.5.0) 🚀
